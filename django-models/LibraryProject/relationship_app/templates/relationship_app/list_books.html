@@ -4,10 +4,10 @@
     <title>Book List</title>
   </head>
   <body>
-    <h1>Books and Authors</h1>
+    <h1>Book List</h1>
     <ul>
       {% for book in books %}
-      <li>{{ book.title }} by {{ book.author.name }}</li>
+      <li>{{ book.title }} by {{ book.author }}</li>
       {% endfor %}
     </ul>
   </body>
