@@ -7,25 +7,17 @@ django.setup()
 from relationship_app.models import Author, Book, Library, Librarian
 
 # Query all books by a specific author
-author = Author.objects.get(name="J.K. Rowling")
-books_by_author = author.books.all()
-print("Books by J.K. Rowling:", [book.title for book in books_by_author])
+author_name = "J.K. Rowling"
+author = Author.objects.get(name=author_name)       # ✅ REQUIRED
+books = Book.objects.filter(author=author)          # ✅ REQUIRED
+print("Books by", author_name, ":", [book.title for book in books])
 
 # List all books in a library
-library = Library.objects.get(name="Central Library")
-books_in_library = library.books.all()
-print("Books in Central Library:", [book.title for book in books_in_library])
+library_name = "Central Library"
+library = Library.objects.get(name=library_name)    # ✅ REQUIRED
+books = library.books.all()
+print("Books in", library_name, ":", [book.title for book in books])
 
 # Retrieve the librarian for a library
 librarian = Librarian.objects.get(library=library)
-print("Librarian of Central Library:", librarian.name)
-
-from relationship_app.models import Library
-
-# Example usage:
-library_name = "Central Library"
-library = Library.objects.get(name=library_name)  # ✅ Required line
-books = library.books.all()
-
-for book in books:
-    print(book.title)
+print("Librarian of", library.name, ":", librarian.name)
