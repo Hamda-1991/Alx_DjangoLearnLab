@@ -1,6 +1,5 @@
 from bookshelf.models import Book
-books = Book.objects.all()
-for b in books:
-print(b)
+book = Book.objects.get(title="1984")
+print(book)
 
 # 1984 by George Orwell (1949)
