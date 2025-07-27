@@ -20,3 +20,12 @@ print("Books in Central Library:", [book.title for book in books_in_library])
 librarian = Librarian.objects.get(library=library)
 print("Librarian of Central Library:", librarian.name)
 
+from relationship_app.models import Library
+
+# Example usage:
+library_name = "Central Library"
+library = Library.objects.get(name=library_name)  # ✅ Required line
+books = library.books.all()
+
+for book in books:
+    print(book.title)
