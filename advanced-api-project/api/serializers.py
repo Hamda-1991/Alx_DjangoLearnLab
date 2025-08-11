@@ -1,16 +1,17 @@
 from rest_framework import serializers
-from .models import Author, Book
 from django.utils import timezone
+from .models import Author, Book
 
-
-# BookSerializer:
-# Serializes all fields of the Book model with validation.
 class BookSerializer(serializers.ModelSerializer):
+    """
+    Serializes Book model fields.
+    Includes validation to ensure publication_year is not in the future.
+    """
     class Meta:
         model = Book
-        fields = '__all__'
+        # export id, title, publication_year and author (author is FK id)
+        fields = ['id', 'title', 'publication_year', 'author']
 
-    # Custom validation to ensure year is not in the future
     def validate_publication_year(self, value):
         current_year = timezone.now().year
         if value > current_year:
@@ -18,11 +19,13 @@ class BookSerializer(serializers.ModelSerializer):
         return value
 
 
-# AuthorSerializer:
-# Serializes Author model with nested BookSerializer for related books.
 class AuthorSerializer(serializers.ModelSerializer):
-    books = BookSerializer(many=True, read_only=True)  # Nested books, read-only
+    """
+    Serializes Author model and nests the related books using BookSerializer.
+    The 'books' field comes from Book.author related_name='books'.
+    """
+    books = BookSerializer(many=True, read_only=True)
 
     class Meta:
         model = Author
-        fields = ['name', 'books']
+        fields = ['id', 'name', 'books']
