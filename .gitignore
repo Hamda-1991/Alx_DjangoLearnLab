@@ -1,0 +1,14 @@
+# Python
+venv/
+env/
+__pycache__/
+*.py[cod]
+*.pyo
+db.sqlite3
+media/
+.vscode/
+.DS_Store
+Thumbs.db
+*.env
+.idea/
+*.bak
