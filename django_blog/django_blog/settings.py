@@ -52,7 +52,6 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = 'django_blog.urls'
 
-STATIC_URL = 'static/'
 
 TEMPLATES = [
     {
@@ -70,6 +69,15 @@ TEMPLATES = [
     },
 ]
 
+# Redirects after login/logout
+LOGIN_REDIRECT_URL = "profile"
+LOGOUT_REDIRECT_URL = "login"
+LOGIN_URL = "login"  # where @login_required sends anonymous users
+
+# Static (make sure it exists)
+STATIC_URL = "static/"
+STATICFILES_DIRS = [BASE_DIR / "static"]
+
 WSGI_APPLICATION = 'django_blog.wsgi.application'
 
 
@@ -78,14 +86,12 @@ WSGI_APPLICATION = 'django_blog.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-        'ENGINE': 'django.db.backends.postgresql',  # or 'django.db.backends.mysql'
+        'ENGINE': 'django.db.backends.postgresql',
         'NAME': 'your_db_name',
         'USER': 'your_db_user',
         'PASSWORD': 'your_db_password',
-        'HOST': 'localhost',   # or your DB server IP
-        'PORT': '5432',        # defa
+        'HOST': 'localhost',
+        'PORT': '5432',
     }
 }
 
