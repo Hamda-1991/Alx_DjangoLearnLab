@@ -12,7 +12,7 @@ class PostForm(forms.ModelForm):
 class CommentForm(forms.ModelForm):
     class Meta:
         model = Comment
-        fields = ['content']
+        fields = ['title', 'content', 'tags']
         widgets = {
             'content': forms.Textarea(attrs={'rows': 3, 'placeholder': 'Write a comment...'}),
         }

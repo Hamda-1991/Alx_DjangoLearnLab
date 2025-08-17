@@ -31,6 +31,13 @@ urlpatterns = [
      path('post/<int:pk>/comments/new/', CommentCreateView.as_view(), name='comment-create'),
     path('comment/<int:pk>/update/', CommentUpdateView.as_view(), name='comment-update'),
     path('comment/<int:pk>/delete/', CommentDeleteView.as_view(), name='comment-delete'),
+    
+    
+    # Search
+    path('search/', views.search_posts, name='search-posts'),
+
+    # Filter by tag
+    path('tags/<str:tag_name>/', views.posts_by_tag, name='posts-by-tag'),
 
     # (Optional) home page
     path("", views.home, name="home"),
