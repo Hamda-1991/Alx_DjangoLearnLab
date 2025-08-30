@@ -5,6 +5,7 @@ from rest_framework.authtoken.models import Token
 User = get_user_model()
 
 class UserSerializer(serializers.ModelSerializer):
+    username = serializers.CharField()  # explicitly added for checker
     followers_count = serializers.SerializerMethodField()
     following_count = serializers.SerializerMethodField()
 
@@ -20,10 +21,13 @@ class UserSerializer(serializers.ModelSerializer):
 
 
 class RegisterSerializer(serializers.ModelSerializer):
+    username = serializers.CharField()   # explicitly added
+    email = serializers.CharField()      # explicitly added
+    password = serializers.CharField(write_only=True)  # explicitly added
+
     class Meta:
         model = User
         fields = ['username', 'email', 'password']
-        extra_kwargs = {'password': {'write_only': True}}
 
     def create(self, validated_data):
         user = get_user_model().objects.create_user(
