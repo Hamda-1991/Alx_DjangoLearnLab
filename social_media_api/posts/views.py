@@ -3,6 +3,14 @@ from rest_framework import viewsets, permissions, filters
 from rest_framework.pagination import PageNumberPagination
 from .models import Post, Comment
 from .serializers import PostSerializer, CommentSerializer
+from rest_framework.views import APIView
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
+from rest_framework import status
+from django.shortcuts import get_object_or_404
+from django.conf import settings
+
+
 
 # Create your views here.
 
@@ -31,3 +39,21 @@ class CommentViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         serializer.save(author=self.request.user)
+
+class FeedPagination(PageNumberPagination):
+    page_size = 10
+    page_size_query_param = 'page_size'
+    max_page_size = 50
+
+class FeedView(APIView):
+    permission_classes = [IsAuthenticated]
+    pagination_class = FeedPagination
+
+    def get(self, request):
+        # users current user follows
+        following_qs = request.user.following.all()
+        posts = Post.objects.filter(author__in=following_qs).order_by('-created_at')
+        paginator = self.pagination_class()
+        page = paginator.paginate_queryset(posts, request)
+        serializer = PostSerializer(page, many=True, context={'request': request})
+        return paginator.get_paginated_response(serializer.data)
