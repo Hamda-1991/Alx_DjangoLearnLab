@@ -7,8 +7,8 @@ urlpatterns = [
     path('profile/', ProfileView.as_view(), name='profile'),
     
      # follow/unfollow routes
-    path('follow/<int:user_id>/', FollowUserView.as_view(), name='follow'),
-    path('unfollow/<int:user_id>/', UnfollowUserView.as_view(), name='unfollow'),
+    path("follow/<int:user_id>/", FollowUserView.as_view(), name="follow-user"),
+    path("unfollow/<int:user_id>/", UnfollowUserView.as_view(), name="unfollow-user"),
 
     # optional listing
     path('<int:user_id>/followers/', UserFollowersView.as_view(), name='user-followers'),
