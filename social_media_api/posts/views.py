@@ -48,15 +48,23 @@ class FeedPagination(PageNumberPagination):
 
 
 class FeedView(APIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticated]
 
     def get(self, request):
-        # Get users the current user follows
-        following_qs = request.user.following.all()
-        posts = Post.objects.filter(author__in=following_qs).order_by('-created_at')
+        # get all the users the current user is following
+        following_users = request.user.following.all()
 
-        # Paginate results
-        paginator = FeedPagination()
-        page = paginator.paginate_queryset(posts, request)
-        serializer = PostSerializer(page, many=True, context={'request': request})
-        return paginator.get_paginated_response(serializer.data)
+        # fetch posts by followed users, ordered by creation date DESC
+        posts = Post.objects.filter(author__in=following_users).order_by('-created_at')
+
+        # serialize the posts
+        data = [
+            {
+                "id": post.id,
+                "author": post.author.username,
+                "content": post.content,
+                "created_at": post.created_at
+            }
+            for post in posts
+        ]
+        return Response(data)
