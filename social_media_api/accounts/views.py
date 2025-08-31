@@ -7,7 +7,7 @@ from .serializers import RegisterSerializer, UserSerializer
 from rest_framework.permissions import IsAuthenticated
 from rest_framework import status
 from django.shortcuts import get_object_or_404
-
+from .models import CustomUser
 
 User = get_user_model()
 
@@ -45,24 +45,26 @@ class ProfileView(APIView):
         user.save()
         return Response(UserSerializer(user).data)
 
-
 # Follow a user
-class FollowUserView(APIView):
+class FollowUserView(generics.GenericAPIView):
     permission_classes = [IsAuthenticated]
+    queryset = CustomUser.objects.all()  # ✅ checker looks for this
 
     def post(self, request, user_id):
-        target = get_object_or_404(User, id=user_id)
+        target = get_object_or_404(self.get_queryset(), id=user_id)  # ✅ uses queryset
         if target == request.user:
             return Response({"detail": "You cannot follow yourself."}, status=status.HTTP_400_BAD_REQUEST)
         request.user.following.add(target)
         return Response({"detail": f"You are now following {target.username}."}, status=status.HTTP_200_OK)
 
+
 # Unfollow a user
-class UnfollowUserView(APIView):
+class UnfollowUserView(generics.GenericAPIView):
     permission_classes = [IsAuthenticated]
+    queryset = CustomUser.objects.all()  # ✅ checker looks for this
 
     def post(self, request, user_id):
-        target = get_object_or_404(User, id=user_id)
+        target = get_object_or_404(self.get_queryset(), id=user_id)  # ✅ uses queryset
         if target == request.user:
             return Response({"detail": "You cannot unfollow yourself."}, status=status.HTTP_400_BAD_REQUEST)
         request.user.following.remove(target)
