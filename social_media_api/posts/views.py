@@ -1,24 +1,20 @@
-from django.shortcuts import render
-from rest_framework import viewsets, permissions, filters
+from django.shortcuts import get_object_or_404
+from rest_framework import viewsets, permissions, filters, status
 from rest_framework.pagination import PageNumberPagination
-from .models import Post, Comment
-from .serializers import PostSerializer, CommentSerializer
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
-from rest_framework import status
-from django.shortcuts import get_object_or_404
-from django.conf import settings
+
+from .models import Post, Comment
+from .serializers import PostSerializer, CommentSerializer
 
 
-
-# Create your views here.
-
-
+# Standard pagination for posts & comments
 class StandardResultsSetPagination(PageNumberPagination):
     page_size = 5
     page_size_query_param = 'page_size'
     max_page_size = 50
+
 
 class PostViewSet(viewsets.ModelViewSet):
     queryset = Post.objects.all().order_by('-created_at')
@@ -29,7 +25,9 @@ class PostViewSet(viewsets.ModelViewSet):
     search_fields = ['title', 'content']
 
     def perform_create(self, serializer):
+        # Automatically assign logged-in user as author
         serializer.save(author=self.request.user)
+
 
 class CommentViewSet(viewsets.ModelViewSet):
     queryset = Comment.objects.all().order_by('-created_at')
@@ -38,22 +36,27 @@ class CommentViewSet(viewsets.ModelViewSet):
     pagination_class = StandardResultsSetPagination
 
     def perform_create(self, serializer):
+        # Automatically assign logged-in user as author
         serializer.save(author=self.request.user)
 
+
+# Custom pagination for feed
 class FeedPagination(PageNumberPagination):
     page_size = 10
     page_size_query_param = 'page_size'
     max_page_size = 50
 
+
 class FeedView(APIView):
     permission_classes = [IsAuthenticated]
-    pagination_class = FeedPagination
 
     def get(self, request):
-        # users current user follows
+        # Get users the current user follows
         following_qs = request.user.following.all()
         posts = Post.objects.filter(author__in=following_qs).order_by('-created_at')
-        paginator = self.pagination_class()
+
+        # Paginate results
+        paginator = FeedPagination()
         page = paginator.paginate_queryset(posts, request)
         serializer = PostSerializer(page, many=True, context={'request': request})
         return paginator.get_paginated_response(serializer.data)
