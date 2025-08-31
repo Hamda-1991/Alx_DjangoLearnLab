@@ -32,3 +32,12 @@ class User(AbstractUser):
     @property
     def following_count(self):
         return self.following.count()
+
+class CustomUser(AbstractUser):
+    bio = models.TextField(blank=True, null=True)
+    following = models.ManyToManyField(
+        'self', symmetrical=False, related_name='followers', blank=True
+    )
+
+    def __str__(self):
+        return self.username

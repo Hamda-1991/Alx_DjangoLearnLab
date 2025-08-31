@@ -1,15 +1,19 @@
-from rest_framework import generics,  permissions, status
+from rest_framework import generics, permissions, status
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from django.contrib.auth import authenticate, get_user_model
 from rest_framework.authtoken.models import Token
 from .serializers import RegisterSerializer, UserSerializer
 from rest_framework.permissions import IsAuthenticated
-from rest_framework import status
 from django.shortcuts import get_object_or_404
 from .models import CustomUser
+from django.contrib.contenttypes.models import ContentType
+from notifications.models import Notification
+
+
 
 User = get_user_model()
+
 
 class RegisterView(generics.CreateAPIView):
     queryset = User.objects.all()
@@ -45,6 +49,7 @@ class ProfileView(APIView):
         user.save()
         return Response(UserSerializer(user).data)
 
+
 # Follow a user
 class FollowUserView(generics.GenericAPIView):
     permission_classes = [permissions.IsAuthenticated]
@@ -58,6 +63,17 @@ class FollowUserView(generics.GenericAPIView):
             return Response({"error": "You cannot follow yourself."}, status=status.HTTP_400_BAD_REQUEST)
 
         request.user.following.add(user_to_follow)
+
+        # ✅ Create notification when following
+        if user_to_follow != request.user:
+            Notification.objects.create(
+                recipient=user_to_follow,
+                actor=request.user,
+                verb="started following you",
+                target_content_type=ContentType.objects.get_for_model(User),
+                target_object_id=user_to_follow.id,
+            )
+
         return Response({"message": f"You are now following {user_to_follow.username}."}, status=status.HTTP_200_OK)
 
 
@@ -74,6 +90,8 @@ class UnfollowUserView(generics.GenericAPIView):
 
         request.user.following.remove(user_to_unfollow)
         return Response({"message": f"You have unfollowed {user_to_unfollow.username}."}, status=status.HTTP_200_OK)
+
+
 # Optional: list followers / following for a given user
 class UserFollowersView(APIView):
     permission_classes = [IsAuthenticated]
@@ -83,6 +101,7 @@ class UserFollowersView(APIView):
         followers = target.followers.all()
         data = [{"id": u.id, "username": u.username} for u in followers]
         return Response({"followers": data})
+
 
 class UserFollowingView(APIView):
     permission_classes = [IsAuthenticated]
