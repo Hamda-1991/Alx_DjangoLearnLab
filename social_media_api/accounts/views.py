@@ -6,7 +6,7 @@ from rest_framework.authtoken.models import Token
 from .serializers import RegisterSerializer, UserSerializer
 from rest_framework.permissions import IsAuthenticated
 from django.shortcuts import get_object_or_404
-from .models import CustomUser
+from .models import User
 from django.contrib.contenttypes.models import ContentType
 from notifications.models import Notification
 
@@ -56,7 +56,7 @@ class FollowUserView(generics.GenericAPIView):
 
     def post(self, request, user_id):
         # reference to CustomUser.objects.all() (important for the checker)
-        users = CustomUser.objects.all()
+        users = User.objects.all()
         user_to_follow = get_object_or_404(users, id=user_id)
 
         if user_to_follow == request.user:
@@ -82,7 +82,7 @@ class UnfollowUserView(generics.GenericAPIView):
 
     def post(self, request, user_id):
         # reference again for consistency
-        users = CustomUser.objects.all()
+        users = User.objects.all()
         user_to_unfollow = get_object_or_404(users, id=user_id)
 
         if user_to_unfollow == request.user:
