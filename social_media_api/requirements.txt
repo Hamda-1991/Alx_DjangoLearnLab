@@ -1,0 +1,18 @@
+# Django==5.2.5
+# djangorestframework==3.16.1
+# djangorestframework-authtoken
+# gunicorn
+# psycopg2-binary
+# whitenoise
+# boto3            # if using S3 for media
+# django-storages  # if using S3
+# python-dotenv    # optional to test env locally
+
+Django==5.2.5
+djangorestframework==3.16.1
+gunicorn
+whitenoise
+dj-database-url
+psycopg2-binary
+pillow
+
